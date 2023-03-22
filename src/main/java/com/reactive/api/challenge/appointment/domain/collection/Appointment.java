@@ -17,12 +17,14 @@ public class Appointment {
     private String date;
     @NotNull(message = "The barber cannot be null")
     private String barberName;
-    private Boolean customerArrived = false;
-    private Boolean isFulFilled = false;
+    private boolean customerArrived = false;
+    private boolean isFulFilled = false;
 
     public Appointment(String date, String barberName) {
         this.id = UUID.randomUUID().toString().substring(0, 10);
         this.date = date;
         this.barberName = barberName;
+        this.customerArrived = false;
+        this.isFulFilled = false;
     }
 }
