@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 import java.util.function.Function;
 @Service
 @AllArgsConstructor
-public class GetAppointmentById implements Function<String, Mono<AppointmentDTO>> {
+public class GetAppointmentByIdUseCase implements Function<String, Mono<AppointmentDTO>> {
 
     private final IAppointmentRepository appointmentRepository;
     private final ModelMapper modelMapper;

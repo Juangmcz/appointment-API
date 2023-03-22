@@ -27,9 +27,9 @@ public class AppointmentRouter {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> getAppointmentById(GetAppointmentById getAppointmentById){
+    public RouterFunction<ServerResponse> getAppointmentById(GetAppointmentByIdUseCase getAppointmentByIdUseCase){
         return route(GET("api/appointments/{id}"),
-                request -> getAppointmentById.apply(request.pathVariable("id"))
+                request -> getAppointmentByIdUseCase.apply(request.pathVariable("id"))
                         .flatMap(appointmentDTO -> ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(appointmentDTO))
