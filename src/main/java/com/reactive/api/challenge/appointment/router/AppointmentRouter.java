@@ -1,5 +1,6 @@
 package com.reactive.api.challenge.appointment.router;
 
+import com.reactive.api.challenge.appointment.domain.customer.CustomerDTO;
 import com.reactive.api.challenge.appointment.domain.dto.AppointmentDTO;
 import com.reactive.api.challenge.appointment.usecases.*;
 import org.springframework.context.annotation.Bean;
@@ -7,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -16,6 +18,12 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 
 @Configuration
 public class AppointmentRouter {
+
+    private WebClient customerAPI;
+
+    public AppointmentRouter(){
+        customerAPI = WebClient.create("http://localhost:8081//api");
+    }
 
     @Bean
     public RouterFunction<ServerResponse> getAllAppointments(GetAllAppointmentsUseCase getAllAppointmentsUseCase){
@@ -66,5 +74,22 @@ public class AppointmentRouter {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(result))
                         .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_FOUND).build()));
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> scheduleAppointment(ScheduleAppointmentUseCase scheduleAppointmentUseCase){
+        return route(POST("api/appointments/{id}/schedule/{id_c}"),
+                request -> customerAPI.get()
+                        .uri("/customers/"+request.pathVariable("id_c"))
+                        .retrieve()
+                        .bodyToMono(CustomerDTO.class)
+                        .flatMap(customerDTO -> scheduleAppointmentUseCase
+                                .schedule(request.pathVariable("id"),customerDTO.getId())
+                                .flatMap(appointmentDTO -> ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(appointmentDTO))
+                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(throwable.getMessage())))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(throwable.getMessage())));
+
     }
 }
