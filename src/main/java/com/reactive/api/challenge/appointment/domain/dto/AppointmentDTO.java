@@ -13,8 +13,7 @@ public class AppointmentDTO {
     private String date;
     @NotNull(message = "The barber cannot be null")
     private String barberName;
-    private boolean customerArrived;
-    private boolean isFulFilled;
+    private boolean isScheduled;
 
     public AppointmentDTO(String date, String barberName) {
         this.date = date;
